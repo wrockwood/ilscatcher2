@@ -1,28 +1,5 @@
 == README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+ILSCatcher was an attempt to create an abstraction layer that could interact with a customized EvergreenILS OPAC skin and return values in JSON format. ILSCatcher2 is a redesign to make the application more modular, maintainable, fast, and able to work with the base Evergreen ILS skin (as much as possible). 
 
 
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.

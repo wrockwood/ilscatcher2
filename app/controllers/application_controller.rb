@@ -1,6 +1,10 @@
 class ApplicationController < ActionController::API
 require 'mechanize'
 
+def load_app_variables
+    @default_loc = '22'
+end
+
 def create_agent(url = '', post_params = '', token = '')
 	opac_base_url = 'https://eg.dev.tadl.org'
 	# NOTE NEED to remove SSL VERIFY NONE in production

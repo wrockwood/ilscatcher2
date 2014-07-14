@@ -5,8 +5,15 @@ class SearchController < ApplicationController
 		search_url = '/eg/opac/results?'
 		query = 'query=' + params[:q].to_s
 		sort = '&sort=' + params[:sort].to_s
-		qtype = '&qtype=' + params[:qtype].to_s if params[:qtype] else '' 
+		qtype = '&qtype=' + params[:qtype].to_s if params[:qtype] else ''
 		
+		if params[:loc]
+  			location = '&locg='+ params[:loc]
+  		else
+  			location = '&locg='+ @default_loc
+    	end
+
+
 		facet = ''
 		if params[:facet]
 			params[:facet].each do |f|
@@ -29,7 +36,7 @@ class SearchController < ApplicationController
 			media_type = ''
 		end
 		
-		mech_request = create_agent(search_url + query + sort + media_type + availability + qtype.to_s + facet.to_s)
+		mech_request = create_agent(search_url + query + sort + media_type + availability + qtype.to_s + facet.to_s + location)
 		page = mech_request[1].parser
 		results = page.css(".result_table_row").map do |item|
 			{

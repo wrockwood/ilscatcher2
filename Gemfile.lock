@@ -123,6 +123,7 @@ DEPENDENCIES
   nikkou
   rails (= 4.1.0)
   rails-api
+  rake (~> 10.3.2)
   spring
   sqlite3
   unicorn

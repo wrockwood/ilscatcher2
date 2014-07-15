@@ -4,6 +4,8 @@ class ItemsController < ApplicationController
   def details
   
   	record_id = params[:record]
+
+  	# default location defined in application controller
   	if params[:loc]
   		location = '?locg='+ params[:loc]
   	else
@@ -12,7 +14,6 @@ class ItemsController < ApplicationController
   	record_details_url = '/eg/opac/record/'
   	mech_request = create_agent(record_details_url + record_id + location + '&copy_limit=50')
   	page = mech_request[1].parser
-  	#fix to remove unneeded path from related subjects and genres
   	item_details = ''
   	page.css('#main-content').each do |detail|
   		item_details =
@@ -53,6 +54,7 @@ class ItemsController < ApplicationController
 
   end
 
+  #fix to remove unneeded path from related subjects and genres
   def clean_related(subject)
  	subject.gsub!(/\n/, "")
   	subject.gsub!(/<[^<>]*>/, "")

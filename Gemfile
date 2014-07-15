@@ -12,6 +12,8 @@ gem 'mechanize'
 
 gem 'nikkou'
 
+gem 'unicorn'
+
 
 
 # To use ActiveModel has_secure_password

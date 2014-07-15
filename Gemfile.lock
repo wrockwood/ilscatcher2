@@ -1,5 +1,5 @@
 GEM
-  remote: http://bundler-api.herokuapp.com/
+  remote: https://rubygems.org/
   specs:
     actionmailer (4.1.0)
       actionpack (= 4.1.0)
@@ -123,7 +123,6 @@ DEPENDENCIES
   nikkou
   rails (= 4.1.0)
   rails-api
-  rake (~> 10.3.2)
   spring
   sqlite3
   unicorn

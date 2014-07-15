@@ -1,4 +1,4 @@
-source "http://bundler-api.herokuapp.com"
+source 'https://rubygems.org'
 
 gem 'rails', '4.1.0'
 
@@ -14,7 +14,7 @@ gem 'nikkou'
 
 gem 'unicorn'
 
-gem 'rake', '~> 10.3.2'
+
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.1.2'

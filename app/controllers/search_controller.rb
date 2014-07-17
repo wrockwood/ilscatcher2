@@ -2,7 +2,7 @@ class SearchController < ApplicationController
 	def basic
 		
 		search_url = '/eg/opac/results?'
-		query = 'query=' + params[:q].to_s
+    query = 'query=' + params[:query].to_s
 		sort = '&sort=' + params[:sort].to_s
 		qtype = '&qtype=' + params[:qtype].to_s if params[:qtype] else ''
 		

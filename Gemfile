@@ -6,8 +6,6 @@ gem 'rails-api'
 
 gem 'spring', :group => :development
 
-gem 'sqlite3', :group => :development
-
 gem 'mechanize'
 
 gem 'nikkou'

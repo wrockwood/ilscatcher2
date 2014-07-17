@@ -1,5 +1,4 @@
 class SearchController < ApplicationController
-
 	def basic
 		
 		search_url = '/eg/opac/results?'

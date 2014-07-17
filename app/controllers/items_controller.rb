@@ -1,6 +1,4 @@
 class ItemsController < ApplicationController
-  before_filter :load_app_variables
-
   def details
   
   	record_id = params[:record]

@@ -1,5 +1,7 @@
 class ApplicationController < ActionController::API
 require 'mechanize'
+before_filter :load_app_variables
+  
 
 def load_app_variables
     @default_loc = '22'

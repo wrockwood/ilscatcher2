@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
 
   get 'account/login'
+  get 'account/place_hold'
 
   get 'items/details'
 

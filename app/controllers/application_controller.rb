@@ -6,6 +6,7 @@ before_filter :load_app_variables
     def load_app_variables
         @default_loc = '22'
         @opac_base_url = 'https://eg.dev.tadl.org'
+        @domain = 'eg.dev.tadl.org'
     end
     
     def create_agent(url = '', post_params = '', token = '')
@@ -14,7 +15,7 @@ before_filter :load_app_variables
     	full_url = @opac_base_url + url
     	if token != ''
     		cookie = Mechanize::Cookie.new('ses', token)
-    		cookie.domain = opac_base_url
+    		cookie.domain = @domain
     		cookie.path = "/"
     		agent.cookie_jar.add!(cookie)
     	end	

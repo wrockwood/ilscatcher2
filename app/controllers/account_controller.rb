@@ -21,4 +21,37 @@ class AccountController < ApplicationController
   		}
   	end
   end
+
+  def place_hold
+  	record_ids = params[:record_ids].split(',').reject(&:empty?).map(&:strip).map {|k| "&hold_target=#{k}" }.join
+
+  	if params[:token] == nil
+  		render :json =>{:message => "you are not logged in"}
+  		return
+  	end
+
+
+  	request = create_agent('/eg/opac/place_hold?hold_type=T' + record_ids,'', params[:token])
+  	agent = request[0]
+  	page = request[1].parser
+  	page_title = page.title
+
+  	if page_title == 'Catalog - Account Login'
+  		render :json =>{:message => 'Invalid token'}
+  		return
+  	end
+  	
+  	hold_form = agent.page.forms[1]
+  	submitt_holds = agent.submit(hold_form)
+  	confirmation_messages = submitt_holds.parser.css('//table#hold-items-list//tr').map do |m|
+  		{
+  			:record_id => m.at_css("td[1]//input").try(:attr, "value"),
+  			:message => m.at_css("td[2]").try(:text).try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip).try(:split, ". ").try(:last),
+  		}
+  	end
+
+  	render :json =>{:confirmation_messages => confirmation_messages}
+
+  end
+
 end

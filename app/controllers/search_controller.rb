@@ -2,7 +2,7 @@ class SearchController < ApplicationController
 	def basic
 		
 		search_url = '/eg/opac/results?'
-    query = 'query=' + params[:query].to_s
+    	query = 'query=' + params[:query].to_s
 		sort = '&sort=' + params[:sort].to_s
 		qtype = '&qtype=' + params[:qtype].to_s if params[:qtype] else ''
 		
@@ -41,7 +41,9 @@ class SearchController < ApplicationController
 			{
 				:title => item.at_css(".record_title").text.strip,
 				:author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
-				:availability => item.at_css(".result_count").try(:text).split('at')[0].try(:strip),
+				:availability_scope => item.css(".result_count").map {|i| clean_availablity(i.try(:text))[2]},
+				:copies_availabile => item.css(".result_count").map {|i| clean_availablity(i.try(:text))[0]},
+				:copies_total => item.css(".result_count").map {|i| clean_availablity(i.try(:text))[1]},
 				:online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
 				:record_id => item.at_css(".record_title").attr('name').sub!(/record_/, ""),
 				:image => item.at_css(".result_table_pic").try(:attr, "src"),
@@ -74,6 +76,15 @@ class SearchController < ApplicationController
 		end
 		
 		render :json =>{:results => results, :facets => facet_list, :more_results => more_results}
+	end
+
+	def clean_availablity(text)
+		availability_array = text.strip.split('of')
+		total_availabe = availability_array[0].strip
+		total_copies_scope_arrary = availability_array[1].split('at', 2)
+		total_copies = total_copies_scope_arrary[0].gsub('copy', '').gsub('copies', '').gsub('available','').strip 
+		availability_scope = total_copies_scope_arrary[1]
+		return total_availabe, total_copies, availability_scope
 	end
 
 end

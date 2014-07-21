@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  get 'account/login'
+
   get 'items/details'
 
   get 'search/basic' 

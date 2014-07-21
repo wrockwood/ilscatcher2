@@ -16,7 +16,7 @@ class ItemsController < ApplicationController
   	page.css('#main-content').each do |detail|
   		item_details =
   		{
-  			:author => detail.at_css(".rdetail_authors_div").try(:text).try(:gsub, /\n/, "").try(:strip),
+  		:author => detail.at_css(".rdetail_authors_div").try(:text).try(:gsub, /\n/, "").try(:strip),
 			:title => detail.at_css("#rdetail_title").text,
 			:summary => detail.at('td:contains("Summary, etc.:")').try(:next_element).try(:text).try(:strip),
 			:contents => detail.at('td:contains("Formatted Contents Note:")').try(:next_element).try(:text).try(:strip),

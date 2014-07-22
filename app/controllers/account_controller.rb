@@ -22,6 +22,26 @@ class AccountController < ApplicationController
   	end
   end
 
+  def checkouts
+  	if params[:token] == nil
+  		render :json =>{:message => "you are not logged in"}
+  		return
+  	end
+
+  	request = create_agent('/eg/opac/myopac/circs','', params[:token])
+  	agent = request[0]
+  	page = request[1].parser
+  	page_title = page.title
+
+  	if page_title == 'Catalog - Account Login'
+  		render :json =>{:message => 'Invalid token'}
+  		return
+  	end
+
+  	checkouts = scrape_checkouts(page)
+  	render :json =>{:checkouts => checkouts}
+  end
+
   def place_holds
   	record_ids = params[:record_ids].split(',').reject(&:empty?).map(&:strip).map {|k| "&hold_target=#{k}" }.join
 

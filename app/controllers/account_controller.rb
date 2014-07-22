@@ -54,14 +54,14 @@ class AccountController < ApplicationController
   end
 
   def renew_items
-  	record_ids = params[:record_ids].split(',').reject(&:empty?).map(&:strip).map {|k| "&circ=#{k}" }.join
+  	circ_ids = params[:circ_ids].split(',').reject(&:empty?).map(&:strip).map {|k| "&circ=#{k}" }.join
 
   	if params[:token] == nil
   		render :json =>{:message => "you are not logged in"}
   		return
   	end
 
-  	request = create_agent('/eg/opac/myopac/circs?api=true' + record_ids,'', params[:token])
+  	request = create_agent('/eg/opac/myopac/circs?action=renew' + circ_ids,'', params[:token])
   	agent = request[0]
   	page = request[1].parser
   	page_title = page.title
@@ -71,17 +71,39 @@ class AccountController < ApplicationController
   		return
   	end
 
-  	confirmation_messages = page.css('table#acct_checked_main_header').css('tr').map do |checkout|
+  	checkouts = scrape_checkouts(page)
+  	confirmation = page.at_css('div.renew-summary').try(:text).try(:strip)
+
+  	errors = page.css('table#acct_checked_main_header').css('tr').drop(1).reject{|r| r.search('span[@class="failure-text"]').present? == false}.map do |checkout| 
+  		{
+  			:message => checkout.css('span.failure-text').text.strip,
+  			:circ_id => checkout.previous.search('input[@name="circ"]').try(:attr, "value").to_s,
+  		}
+  	end	
+
+    render :json =>{:confirmation => confirmation, :errors => errors, :checkouts => checkouts }
+
+  end
+
+  def scrape_checkouts(page)
+  	checkouts = page.css('table#acct_checked_main_header').css('tr').drop(1).reject{|r| r.search('span[@class="failure-text"]').present?}.map do |checkout| 
         {
-        	:name => checkout.at_css("/td[2]").try(:text).try(:strip).try(:gsub!, /\n/," ").try(:squeeze, " "),
-        	:renew_attempts => checkout.css("/td[4]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-        	:due_date => checkout.css("/td[5]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
-        	:checkout_id => checkout.at('td[1]/input').try(:value),
-        	:barcode => checkout.css("/td[6]").text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+        	:title => checkout.search('td[@name="author"]').css('a')[0].try(:text),
+        	:author => checkout.search('td[@name="author"]').css('a')[1].try(:text),
+        	:record_id => clean_record(checkout.search('td[@name="author"]').css('a')[0].try(:attr, "href")),
+        	:checkout_id => checkout.search('input[@name="circ"]').try(:attr, "value").to_s,
+        	:renew_attempts => checkout.search('td[@name="renewals"]').text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+        	:due_date => checkout.search('td[@name="due_date"]').text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
+        	:barcode => checkout.search('td[@name="barcode"]').text.to_s.try(:gsub!, /\n/," ").try(:squeeze, " ").try(:strip),
         }
     end
-    render :json =>{:checkouts => confirmation_messages}
+    return checkouts
+  end
 
+  def clean_record(string)
+  	record_id = string.split('?') rescue nil
+  	record_id = record_id[0].gsub('/eg/opac/record/','') rescue nil
+  	return record_id
   end
 
 

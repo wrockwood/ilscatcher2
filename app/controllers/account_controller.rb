@@ -24,7 +24,7 @@ class AccountController < ApplicationController
 
   def checkouts
   	if params[:token] == nil
-  		render :json =>{:message => "you are not logged in"}
+  		render :json =>{:message => "Active token required"}
   		return
   	end
 
@@ -42,11 +42,35 @@ class AccountController < ApplicationController
   	render :json =>{:checkouts => checkouts}
   end
 
+  def holds
+  	if params[:token] == nil
+  		render :json =>{:message => "Active token required"}
+  		return
+  	end
+
+  	request = create_agent('/eg/opac/myopac/holds','', params[:token])
+  	page = request[1].parser
+  	holds = page.css('tr#acct_holds_temp').map do |hold|
+  		{
+  			:title =>  hold.css('td[2]').css('a').text,
+  			:author => hold.css('td[3]').css('a').text,
+  			:record_id => clean_record(hold.css('td[2]').css('a').try(:attr, 'href').to_s),
+  			:hold_id => hold.search('input[@name="hold_id"]').try(:attr, "value").to_s,
+  			:hold_status => hold.css('td[8]').text.strip,
+  			:queue_status => hold.css('/td[9]/div/div[1]').text.strip,
+  			:queue_state => hold.css('/td[9]/div/div[2]').text.strip,
+  			:pickup_location => hold.css('td[5]').text.strip,
+  		}
+  	end
+
+  	render :json =>{:holds => holds}
+  end
+
   def place_holds
   	record_ids = params[:record_ids].split(',').reject(&:empty?).map(&:strip).map {|k| "&hold_target=#{k}" }.join
 
   	if params[:token] == nil
-  		render :json =>{:message => "you are not logged in"}
+  		render :json =>{:message => "Active token required"}
   		return
   	end
 
@@ -104,6 +128,8 @@ class AccountController < ApplicationController
     render :json =>{:confirmation => confirmation, :errors => errors, :checkouts => checkouts }
 
   end
+
+#Awesome shared functions  
 
   def scrape_checkouts(page)
   	checkouts = page.css('table#acct_checked_main_header').css('tr').drop(1).reject{|r| r.search('span[@class="failure-text"]').present?}.map do |checkout| 

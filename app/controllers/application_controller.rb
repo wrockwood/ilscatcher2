@@ -1,7 +1,11 @@
 class ApplicationController < ActionController::API
 require 'mechanize'
 before_filter :load_app_variables
-  
+before_filter :set_headers
+
+    def set_headers
+        headers['Access-Control-Allow-Origin'] = '*'      
+    end  
 
     def load_app_variables
         @default_loc = '22'

@@ -66,6 +66,10 @@ class AccountController < ApplicationController
   	render :json =>{:holds => holds}
   end
 
+  def manage_holds
+  	
+  end
+
   def place_holds
   	record_ids = params[:record_ids].split(',').reject(&:empty?).map(&:strip).map {|k| "&hold_target=#{k}" }.join
 

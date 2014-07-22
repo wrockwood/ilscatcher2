@@ -12,6 +12,14 @@ class SearchController < ApplicationController
   			location = '&locg='+ @default_loc
     	end
 
+    	if params[:page]
+    		page_number = params[:page]
+    		page_param = '&page=' + params[:page]
+    	else
+    		page_number = 0
+    		page_param = '&page=0'
+    	end
+
 
 		facet = ''
 		if params[:facet]
@@ -35,7 +43,7 @@ class SearchController < ApplicationController
 			media_type = ''
 		end
 		
-		mech_request = create_agent(search_url + query + sort + media_type + availability + qtype.to_s + facet.to_s + location)
+		mech_request = create_agent(search_url + query + sort + media_type + availability + qtype.to_s + facet.to_s + location + page_param)
 		page = mech_request[1].parser
 		results = page.css(".result_table_row").map do |item|
 			{
@@ -75,7 +83,7 @@ class SearchController < ApplicationController
 			more_results = 'false'
 		end
 		
-		render :json =>{:results => results, :facets => facet_list, :more_results => more_results}
+		render :json =>{:results => results, :facets => facet_list, :page => page_number, :more_results => more_results}
 	end
 
 	def clean_availablity(text)

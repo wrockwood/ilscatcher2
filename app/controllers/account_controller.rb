@@ -22,7 +22,7 @@ class AccountController < ApplicationController
   	end
   end
 
-  def place_hold
+  def place_holds
   	record_ids = params[:record_ids].split(',').reject(&:empty?).map(&:strip).map {|k| "&hold_target=#{k}" }.join
 
   	if params[:token] == nil

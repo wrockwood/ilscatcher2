@@ -54,7 +54,8 @@ class SearchController < ApplicationController
 				:copies_total => item.css(".result_count").map {|i| clean_availablity(i.try(:text))[1]},
 				:online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
 				:record_id => item.at_css(".record_title").attr('name').sub!(/record_/, ""),
-				:image => item.at_css(".result_table_pic").try(:attr, "src"),
+				#hack for dev below
+				:image => 'http://catalog.tadl.org' + item.at_css(".result_table_pic").try(:attr, "src"),
 				:abstract => item.at_css('[@name="bib_summary"]').try(:text).try(:strip).try(:squeeze, " "),
 				:contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
 				:record_year => item.at_css(".record_year").try(:text),

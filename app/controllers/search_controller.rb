@@ -59,7 +59,8 @@ class SearchController < ApplicationController
 				:abstract => item.at_css('[@name="bib_summary"]').try(:text).try(:strip).try(:squeeze, " "),
 				:contents => item.at_css('[@name="bib_contents"]').try(:text).try(:strip).try(:squeeze, " "),
 				:record_year => item.at_css(".record_year").try(:text),
-				:format_icon => item.at_css(".result_table_title_cell img").try(:attr, "src"),
+				#hack for dev below
+				:format_icon => 'http://catalog.tadl.org' + item.at_css(".result_table_title_cell img").try(:attr, "src"),
 			}
 		end
 

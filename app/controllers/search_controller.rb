@@ -49,9 +49,9 @@ class SearchController < ApplicationController
 			{
 				:title => item.at_css(".record_title").text.strip,
 				:author => item.at_css('[@name="item_author"]').text.strip.try(:squeeze, " "),
-				:availability_scope => item.css(".result_count").map {|i| clean_availablity(i.try(:text))[2]},
-				:copies_availabile => item.css(".result_count").map {|i| clean_availablity(i.try(:text))[0]},
-				:copies_total => item.css(".result_count").map {|i| clean_availablity(i.try(:text))[1]},
+				:availability => item.css(".result_count").map {|i| i.try(:text).try(:strip)},
+				:copies_availabile => item.css(".result_count").map {|i| clean_availablity_counts(i.try(:text))[0]},
+				:copies_total => item.css(".result_count").map {|i| clean_availablity_counts(i.try(:text))[1]},
 				:online => item.search('a').text_includes("Connect to this resource online").first.try(:attr, "href"),
 				:record_id => item.at_css(".record_title").attr('name').sub!(/record_/, ""),
 				#hack for dev below
@@ -88,7 +88,7 @@ class SearchController < ApplicationController
 		render :json =>{:results => results, :facets => facet_list, :page => page_number, :more_results => more_results}
 	end
 
-	def clean_availablity(text)
+	def clean_availablity_counts(text)
 		availability_array = text.strip.split('of')
 		total_availabe = availability_array[0].strip
 		total_copies_scope_arrary = availability_array[1].split('at', 2)
@@ -96,5 +96,7 @@ class SearchController < ApplicationController
 		availability_scope = total_copies_scope_arrary[1]
 		return total_availabe, total_copies, availability_scope
 	end
+
+	
 
 end

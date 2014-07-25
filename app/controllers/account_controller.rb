@@ -22,6 +22,29 @@ class AccountController < ApplicationController
   	end
   end
 
+  def check_token
+    request = create_agent('/eg/opac/myopac/main','', params[:token])
+    agent = request[0]
+    page = request[1]
+    token = agent.cookies.detect {|c| c.name == 'ses'}
+    full_name = page.parser.css('span#dash_user').try(:text).strip
+    checkouts = page.parser.css('span#dash_checked').try(:text).strip
+    holds = page.parser.css('span#dash_holds').try(:text).strip
+    holds_ready = page.parser.css('span#dash_pickup').try(:text).strip
+    fines = page.parser.css('span#dash_fines').try(:text).strip
+    if token == nil
+      render :json =>{:message => 'failed'}
+    else
+      render :json =>{:full_name => full_name, 
+        :checkouts => checkouts, 
+        :holds => holds,
+        :holds_ready => holds_ready,
+        :fine => fines, 
+        :token => token.try(:value)
+      }
+    end
+  end
+
   def checkouts
   	if params[:token] == nil
   		render :json =>{:message => "Active token required"}

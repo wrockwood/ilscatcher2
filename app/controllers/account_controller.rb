@@ -25,23 +25,13 @@ class AccountController < ApplicationController
   def check_token
     request = create_agent('/eg/opac/myopac/main','', params[:token])
     agent = request[0]
-    page = request[1]
+    page = request[1].parser
     token = agent.cookies.detect {|c| c.name == 'ses'}
-    full_name = page.parser.css('span#dash_user').try(:text).strip
-    checkouts = page.parser.css('span#dash_checked').try(:text).strip
-    holds = page.parser.css('span#dash_holds').try(:text).strip
-    holds_ready = page.parser.css('span#dash_pickup').try(:text).strip
-    fines = page.parser.css('span#dash_fines').try(:text).strip
+    basic_info = user_basic_info(page)
     if token == nil
       render :json =>{:message => 'failed'}
     else
-      render :json =>{:full_name => full_name, 
-        :checkouts => checkouts, 
-        :holds => holds,
-        :holds_ready => holds_ready,
-        :fine => fines, 
-        :token => token.try(:value)
-      }
+      render :json => basic_info 
     end
   end
 
@@ -85,6 +75,8 @@ class AccountController < ApplicationController
   			:pickup_location => hold.css('td[5]').text.strip,
   		}
   	end
+
+    
 
   	render :json =>{:holds => holds}
   end
@@ -177,6 +169,20 @@ class AccountController < ApplicationController
   	record_id = string.split('?') rescue nil
   	record_id = record_id[0].gsub('/eg/opac/record/','') rescue nil
   	return record_id
+  end
+
+  def user_basic_info(page)
+    basic_info = page.css('body').map do |p|
+      {
+        :full_name => p.css('span#dash_user').try(:text).strip,
+        :checkouts => p.css('span#dash_checked').try(:text).strip, 
+        :holds => p.css('span#dash_holds').try(:text).strip,
+        :holds_ready => p.css('span#dash_pickup').try(:text).strip,
+        :fine => p.css('span#dash_fines').try(:text).strip, 
+      }
+    end
+
+    return basic_info[0]
   end
 
 

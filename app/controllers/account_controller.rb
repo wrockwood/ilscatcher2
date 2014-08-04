@@ -27,7 +27,7 @@ class AccountController < ApplicationController
     agent = request[0]
     page = request[1].parser
     token = agent.cookies.detect {|c| c.name == 'ses'}
-    basic_info = user_basic_info(page)
+    basic_info = user_basic_info(page, agent)
     if token == nil
       render :json =>{:message => 'failed'}
     else
@@ -171,7 +171,8 @@ class AccountController < ApplicationController
   	return record_id
   end
 
-  def user_basic_info(page)
+  def user_basic_info(page, agent)
+    token = agent.cookies.detect {|c| c.name == 'ses'}
     basic_info = page.css('body').map do |p|
       {
         :full_name => p.css('span#dash_user').try(:text).strip,
@@ -179,6 +180,7 @@ class AccountController < ApplicationController
         :holds => p.css('span#dash_holds').try(:text).strip,
         :holds_ready => p.css('span#dash_pickup').try(:text).strip,
         :fine => p.css('span#dash_fines').try(:text).strip, 
+        :token => token.try(:value),
       }
     end
 

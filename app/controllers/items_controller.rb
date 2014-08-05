@@ -23,8 +23,8 @@ class ItemsController < ApplicationController
 			:record_id => record_id,
 			:availability_scope => detail.css('meta[@property="seller"]').map {|i| i.attr('content')}, 
 			:copies_available => detail.css('meta[@property="offerCount"]').map {|i| i.attr('content')},
-			:copies_total => clean_totals_holds(detail.at('h2:contains("Current holds")').try(:next_element).text)[1],
-			:holds => clean_totals_holds(detail.at('h2:contains("Current holds")').try(:next_element).text)[0],
+			:copies_total => clean_totals_holds(detail.at('h2:contains("Current holds")').try(:next_element).try(:text))[1],
+			:holds => clean_totals_holds(detail.at('h2:contains("Current holds")').try(:next_element).try(:text))[0],
 			:eresource => detail.at('p.rdetail_uri').try(:at, 'a').try(:attr, "href"),
 			:image => detail.at_css('#rdetail_image').try(:attr, "src").try(:gsub, /^\//, "http://catalog.tadl.org/"),
 			:format => detail.at('div#rdetail_format_label').text.strip,
@@ -33,7 +33,7 @@ class ItemsController < ApplicationController
 			:publisher => detail.search('span[@property="publisher"]').search('span[@property="name"]').try(:text).try(:strip),
 			:publication_place => detail.search('span[@property="publisher"]').search('span[@property="location"]').try(:text).gsub(':','').try(:strip),
 			:isbn => detail.css('span[@property="isbn"]').map {|i| i.text},
-			:physical_description => detail.at('li#rdetail_phys_desc').at('span.rdetail_value').try(:text),
+			:physical_description => detail.at('li#rdetail_phys_desc').try(:at, 'span.rdetail_value').try(:text),
 			:related => detail.css('.rdetail_subject_value').to_s.split('<br>').reverse.drop(1).reverse.map { |i| clean_related(i)}.uniq,
   		}
   	end

@@ -61,29 +61,19 @@ class AccountController < ApplicationController
   		return
   	end
 
-  	request = create_agent('/eg/opac/myopac/holds','', params[:token])
+    if params[:task] == nil || params[:hold_id] == nil
+      action = ''
+    else
+      action = { "action" => params[:task], "hold_id" =>  params[:hold_id]}
+    end
+
+  	request = create_agent('/eg/opac/myopac/holds?limit=41', action, params[:token])
   	page = request[1].parser
-  	holds = page.css('tr#acct_holds_temp').map do |hold|
-  		{
-  			:title =>  hold.css('td[2]').css('a').text,
-  			:author => hold.css('td[3]').css('a').text,
-  			:record_id => clean_record(hold.css('td[2]').css('a').try(:attr, 'href').to_s),
-  			:hold_id => hold.search('input[@name="hold_id"]').try(:attr, "value").to_s,
-  			:hold_status => hold.css('td[8]').text.strip,
-  			:queue_status => hold.css('/td[9]/div/div[1]').text.strip,
-  			:queue_state => hold.css('/td[9]/div/div[2]').text.strip,
-  			:pickup_location => hold.css('td[5]').text.strip,
-  		}
-  	end
-
-    
-
-  	render :json =>{:holds => holds}
+  	holds = scrape_holds(page)
+  	render :json =>{:holds => holds, :count => holds.size}
   end
 
-  def manage_holds
-  	
-  end
+
 
   def place_holds
   	record_ids = params[:record_ids].split(',').reject(&:empty?).map(&:strip).map {|k| "&hold_target=#{k}" }.join
@@ -148,7 +138,7 @@ class AccountController < ApplicationController
 
   end
 
-#Awesome shared functions  
+
 
   def scrape_checkouts(page)
   	checkouts = page.css('table#acct_checked_main_header').css('tr').drop(1).reject{|r| r.search('span[@class="failure-text"]').present?}.map do |checkout| 
@@ -163,6 +153,22 @@ class AccountController < ApplicationController
         }
     end
     return checkouts
+  end
+
+  def scrape_holds(page)
+    holds = page.css('tr#acct_holds_temp').map do |hold|
+      {
+        :title =>  hold.css('td[2]').css('a').text,
+        :author => hold.css('td[3]').css('a').text,
+        :record_id => clean_record(hold.css('td[2]').css('a').try(:attr, 'href').to_s),
+        :hold_id => hold.search('input[@name="hold_id"]').try(:attr, "value").to_s,
+        :hold_status => hold.css('td[8]').text.strip,
+        :queue_status => hold.css('/td[9]/div/div[1]').text.strip,
+        :queue_state => hold.css('/td[9]/div/div[2]').text.strip,
+        :pickup_location => hold.css('td[5]').text.strip,
+      }
+    end
+    return holds
   end
 
   def clean_record(string)
@@ -186,7 +192,4 @@ class AccountController < ApplicationController
 
     return basic_info[0]
   end
-
-
-
 end

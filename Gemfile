@@ -12,7 +12,9 @@ gem 'nikkou'
 
 gem 'unicorn'
 
+gem 'memcachier'
 
+gem 'dalli'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.1.2'

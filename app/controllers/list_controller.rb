@@ -19,4 +19,10 @@ class ListController < ApplicationController
         render :json => { :name => list_name, :description => list_description, :items => itemlist }
     end
 
+    def view
+        list = params[:list]
+        response = Rails.cache.read(list)
+        render :json => response
+    end
+
 end

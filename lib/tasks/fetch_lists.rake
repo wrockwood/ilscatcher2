@@ -6,14 +6,14 @@ task :fetch_lists => :environment do
     require 'memcachier'
     require 'dalli'
 
-    books_fic     = JSON.parse(open("/list/fetch.json?list_id=20518").read)
-    books_nonfic  = JSON.parse(open("/list/fetch.json?list_id=20518").read)
-    teen_books    = JSON.parse(open("/list/fetch.json?list_id=20518").read)
-    teen_manga    = JSON.parse(open("/list/fetch.json?list_id=20518").read)
-    youth_books   = JSON.parse(open("/list/fetch.json?list_id=20518").read)
-    youth_display = JSON.parse(open("/list/fetch.json?list_id=20518").read)
-    dvds_hot      = JSON.parse(open("/list/fetch.json?list_id=20518").read)
-    dvds_new      = JSON.parse(open("/list/fetch.json?list_id=20518").read)
+    books_fic     = JSON.parse(open("http://kcl-listcacher.herokuapp.com/list/fetch.json?list_id=20518").read)
+    books_nonfic  = JSON.parse(open("http://kcl-listcacher.herokuapp.com/list/fetch.json?list_id=20518").read)
+    teen_books    = JSON.parse(open("http://kcl-listcacher.herokuapp.com/list/fetch.json?list_id=20518").read)
+    teen_manga    = JSON.parse(open("http://kcl-listcacher.herokuapp.com/list/fetch.json?list_id=20518").read)
+    youth_books   = JSON.parse(open("http://kcl-listcacher.herokuapp.com/list/fetch.json?list_id=20518").read)
+    youth_display = JSON.parse(open("http://kcl-listcacher.herokuapp.com/list/fetch.json?list_id=20518").read)
+    dvds_hot      = JSON.parse(open("http://kcl-listcacher.herokuapp.com/list/fetch.json?list_id=20518").read)
+    dvds_new      = JSON.parse(open("http://kcl-listcacher.herokuapp.com/list/fetch.json?list_id=20518").read)
 
 
     Rails.cache.write("books_fic", books_fic)

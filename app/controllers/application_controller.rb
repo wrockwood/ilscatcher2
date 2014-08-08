@@ -9,8 +9,8 @@ before_filter :set_headers
 
     def load_app_variables
         @default_loc = '22'
-        @opac_base_url = 'https://eg.dev.tadl.org'
-        @domain = 'eg.dev.tadl.org'
+        @opac_base_url = 'https://eg.dev.kalkaskalibrary.org'
+        @domain = 'eg.dev.kalkaskalibrary.org'
     end
     
     def create_agent(url = '', post_params = '', token = '')
